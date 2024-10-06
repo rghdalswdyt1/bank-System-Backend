@@ -9,8 +9,12 @@ const accountSchema = new mongoose.Schema({
   accountType: {
     type: String,
     required: true,
-    enum: ['Saving', 'Current'],
-    default: 'Saving'
+    enum: ['Personal account', 'Savings account', 'Business account'], // إضافة الأنواع المختلفة
+    default: 'Savings' // الحساب الافتراضي يكون حساب توفير
+  },
+  isDefault: { // تحديد ما إذا كان هذا الحساب هو الحساب الافتراضي
+    type: Boolean,
+    default: false
   },
   balance: {
     type: Number,

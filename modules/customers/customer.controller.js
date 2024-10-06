@@ -26,7 +26,7 @@ const generateRandomAccountNumber = () => {
 // إنشاء عميل جديد
 export const createCustomer = async (req, res) => {
   try {
-      const { name, email, phone, address, dateOfBirth, nationalID, password,repassword } = req.body;
+      const { name, email, phone, address, dateOfBirth, nationalID, password, repassword } = req.body;
 
       // Ensure all required fields are provided
       if (!name || !email || !phone || !address || !dateOfBirth || !nationalID || !password) {
@@ -50,8 +50,8 @@ export const createCustomer = async (req, res) => {
           address, 
           dateOfBirth, 
           nationalID, 
-          password: hashPassword ,
-          repassword:hashPassword
+          password: hashPassword,
+          repassword: hashPassword
       });
 
       // Save the customer to the database
@@ -60,12 +60,13 @@ export const createCustomer = async (req, res) => {
       // Generate a random account number
       const accountNumber = generateRandomAccountNumber();
 
-      // Create a new bank account for the customer
+      // Create a new bank account for the customer (Default account)
       const account = new Account({
           customer: customer._id,
-          accountType: 'Saving', // You can change this if you want a different type
+          accountType: 'Savings account', // نوع الحساب الافتراضي يكون Savings
           balance: 0, // Initial balance
-          accountNumber
+          accountNumber,
+          isDefault: true // تحديد هذا الحساب كحساب افتراضي
       });
 
       // Save the bank account to the database
@@ -93,6 +94,7 @@ export const createCustomer = async (req, res) => {
       res.status(500).json({ message: 'Error creating customer', error });
   }
 };
+
 // تسجيل الدخول
 export const loginCustomer = async (req, res) => {
   try {
@@ -212,5 +214,25 @@ export const updateCustomer = async (req, res) => {
       res.status(200).json({ message: 'Customer and associated data deleted successfully' });
     } catch (error) {
       res.status(500).json({ message: 'Error deleting customer', error });
+    }
+  };
+
+  export const getCustomerById = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      // البحث عن العميل باستخدام id
+      const customer = await Customer.findById(id);
+      if (!customer) {
+        return res.status(404).json({ message: 'Customer not found' });
+      }
+  
+      // إرسال بيانات العميل والحسابات المرتبطة به في الرد
+      res.status(200).json({
+        message: 'Customer and bank accounts found successfully',
+        customer,
+      });
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching customer', error });
     }
   };

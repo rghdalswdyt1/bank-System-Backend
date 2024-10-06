@@ -1,15 +1,17 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
-import { createBankAccount, deleteBankAccount, getBankAccountById, getCustomerAccounts } from "./account.controller.js";
-
+import { createBankAccount, deleteBankAccount, getBankAccountById, getCustomerAccounts, getDefaultBankAccount } from "./account.controller.js";
 
 const router = Router();
 
 // إنشاء حساب بنكي جديد
 router.post('/create', authMiddleware, createBankAccount);
 
-// عرض الحسابات البنكية للعميل
+// عرض جميع الحسابات البنكية للعميل
 router.get('/accounts', authMiddleware, getCustomerAccounts);
+
+// عرض الحساب البنكي الافتراضي للعميل
+router.get('/default-account', authMiddleware, getDefaultBankAccount);
 
 // عرض حساب بنكي محدد
 router.get('/account/:accountId', authMiddleware, getBankAccountById);

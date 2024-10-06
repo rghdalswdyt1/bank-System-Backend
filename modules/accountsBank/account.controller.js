@@ -98,4 +98,19 @@ export const getBankAccountById = async (req, res) => {
       res.status(500).json({ message: 'Error fetching bank account', error });
     }
   };
+  export const getDefaultBankAccount = async (req, res) => {
+    try {
+      const customerId = req.customer.id;
   
+      // البحث عن الحساب الافتراضي فقط
+      const defaultAccount = await Account.findOne({ customer: customerId, isDefault: true });
+  
+      if (!defaultAccount) {
+        return res.status(404).json({ message: 'No default bank account found' });
+      }
+  
+      res.status(200).json(defaultAccount);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching default bank account', error });
+    }
+  };
