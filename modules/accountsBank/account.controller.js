@@ -43,8 +43,9 @@ export const getCustomerAccounts = async (req, res) => {
     try {
       const customerId = req.customer.id; // الحصول على ID العميل من الـ JWT Token
   
-      // البحث عن جميع الحسابات المرتبطة بالعميل
-      const accounts = await Account.find({ customer: customerId });
+      // البحث عن جميع الحسابات المرتبطة بالعميل مع عرض بيانات العميل
+      const accounts = await Account.find({ customer: customerId })
+        .populate('customer', 'name email phone'); // عرض الحقول المطلوبة من العميل
   
       if (!accounts || accounts.length === 0) {
         return res.status(404).json({ message: 'No bank accounts found' });
@@ -55,6 +56,7 @@ export const getCustomerAccounts = async (req, res) => {
       res.status(500).json({ message: 'Error fetching bank accounts', error });
     }
   };
+  
 // حذف حساب بنكي
 export const deleteBankAccount = async (req, res) => {
     try {
@@ -83,7 +85,8 @@ export const getBankAccountById = async (req, res) => {
       const customerId = req.customer.id; // الحصول على معرف العميل من الـ JWT Token
   
       // البحث عن الحساب البنكي باستخدام accountId والتأكد من أنه ملك للعميل
-      const account = await Account.findOne({ _id: accountId, customer: customerId });
+      const account = await Account.findOne({ _id: accountId, customer: customerId })
+        .populate('customer', 'name email phone'); // عرض الحقول المطلوبة من العميل
   
       if (!account) {
         return res.status(404).json({ message: 'Account not found or not authorized' });

@@ -130,3 +130,67 @@ export const transfer = async (req, res) => {
     res.status(500).json({ message: 'Error processing transfer', error });
   }
 };
+
+// Function لعرض جميع العمليات التي قام بها العميل
+export const getMyTransactions = async (req, res) => {
+    try {
+      const customerId = req.customer.id; // الحصول على ID العميل من الـ JWT Token
+  
+      // البحث عن جميع الحسابات المرتبطة بالعميل
+      const accounts = await Account.find({ customer: customerId });
+      if (!accounts || accounts.length === 0) {
+        return res.status(404).json({ message: 'No accounts found' });
+      }
+  
+      // الحصول على جميع الـ accountIds الخاصة بحسابات العميل
+      const accountIds = accounts.map(account => account._id);
+  
+      // البحث عن جميع المعاملات المرتبطة بحسابات العميل
+      const transactions = await Transaction.find({
+        account: { $in: accountIds } // البحث عن كل المعاملات بناءً على الحسابات
+      })
+        .populate('account')        // عرض بيانات الحساب الأساسي
+        .populate('fromAccount')    // عرض رقم الحساب المرسل في حالة التحويل
+        .populate('toAccount');     // عرض رقم الحساب المستلم في حالة التحويل
+  
+      if (!transactions || transactions.length === 0) {
+        return res.status(404).json({ message: 'No transactions found' });
+      }
+  
+      res.status(200).json(transactions);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching transactions', error });
+    }
+  };
+  
+
+  export const getIncomingTransfers = async (req, res) => {
+    try {
+      const customerId = req.customer.id; // الحصول على ID العميل من الـ JWT Token
+  
+      // البحث عن جميع الحسابات المرتبطة بالعميل
+      const accounts = await Account.find({ customer: customerId });
+  
+      if (!accounts || accounts.length === 0) {
+        return res.status(404).json({ message: 'No accounts found' });
+      }
+  
+      // الحصول على جميع الـ accountIds الخاصة بحسابات العميل
+      const accountIds = accounts.map(account => account._id);
+  
+      // البحث عن جميع عمليات التحويل الواردة إلى حسابات العميل
+      const incomingTransfers = await Transaction.find({ toAccount: { $in: accountIds }, type: 'Transfer' })
+        .populate('fromAccount', 'accountNumber') // عرض رقم الحساب المرسل
+        .populate('toAccount', 'accountNumber'); // عرض رقم الحساب المستلم
+  
+      if (!incomingTransfers || incomingTransfers.length === 0) {
+        return res.status(404).json({ message: 'No incoming transfers found' });
+      }
+  
+      res.status(200).json(incomingTransfers);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching incoming transfers', error });
+    }
+  };
+  
+  
