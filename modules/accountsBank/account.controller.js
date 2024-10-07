@@ -102,8 +102,9 @@ export const getBankAccountById = async (req, res) => {
     try {
       const customerId = req.customer.id;
   
-      // البحث عن الحساب الافتراضي فقط
-      const defaultAccount = await Account.findOne({ customer: customerId, isDefault: true });
+      // البحث عن الحساب الافتراضي مع بيانات العميل
+      const defaultAccount = await Account.findOne({ customer: customerId, isDefault: true })
+        .populate('customer'); // استخدام populate لجلب بيانات العميل
   
       if (!defaultAccount) {
         return res.status(404).json({ message: 'No default bank account found' });
@@ -114,3 +115,4 @@ export const getBankAccountById = async (req, res) => {
       res.status(500).json({ message: 'Error fetching default bank account', error });
     }
   };
+  
