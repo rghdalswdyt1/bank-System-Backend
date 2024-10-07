@@ -180,7 +180,7 @@ export const getMyTransactions = async (req, res) => {
   
       // البحث عن جميع عمليات التحويل الواردة إلى حسابات العميل
       const incomingTransfers = await Transaction.find({ toAccount: { $in: accountIds }, type: 'Transfer' })
-        .populate('fromAccount', 'accountNumber') // عرض رقم الحساب المرسل
+        .populate('account', 'accountNumber') // عرض رقم الحساب المرسل
         .populate('toAccount', 'accountNumber'); // عرض رقم الحساب المستلم
   
       if (!incomingTransfers || incomingTransfers.length === 0) {
